@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wh.tms.dao.notice.INoticePersonDAO">
+  <resultMap id="BaseResultMap" type="com.wh.tms.entity.po.NoticePerson">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="notice_id" jdbcType="INTEGER" property="noticeId" />
+    <result column="uid" jdbcType="INTEGER" property="uid" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="insert_time" jdbcType="BIGINT" property="insertTime" />
+    <result column="is_read" jdbcType="INTEGER" property="isRead" />
+    <result column="read_time" jdbcType="BIGINT" property="readTime" />
+    <result column="is_receive" jdbcType="INTEGER" property="isReceive" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+  </resultMap>
+  <resultMap id="MyNoticeMap" type="com.wh.tms.entity.vo.NoticeVo">
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="uid" jdbcType="INTEGER" property="uid" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="creater_uid" jdbcType="INTEGER" property="createrUid" />
+    <result column="creater_name" jdbcType="VARCHAR" property="createrName" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="receiveTime" jdbcType="BIGINT" property="receiveTime" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="is_read" jdbcType="INTEGER" property="isRead" />
+    <result column="rTime" jdbcType="BIGINT" property="rTime" />
+    <result column="is_receive" jdbcType="INTEGER" property="isReceive" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="sourceType" jdbcType="INTEGER" property="sourceType" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, notice_id, uid, user_name, insert_time, is_read, read_time, is_receive, status
+  </sql>
+  <select id="selectNoticeCount" resultType="long">
+    select count(1) from t_notice_noticeperson p
+    left join
+    t_notice_notice n
+    on n.id = p.notice_id
+    where 1=1
+    <if test="uid != null and uid gt 0">
+    		and p.uid = #{uid} 
+    </if>
+    <if test="sourceType != null and sourceType gt 0">
+    		and n.source_type = #{sourceType}
+    </if>
+    <if test="isread != null">
+    		and p.is_read = #{isread}
+    </if>
+    and p.status = 0
+    and n.status = 0
+  </select>
+  
+  <select id="selectMyNotice" resultMap="MyNoticeMap">
+    select 
+	    n.id as id,n.creater_name,n.creater_uid,n.title,n.content,n.insert_time,p.is_receive,p.uid,p.user_name,p.is_read,
+	    p.read_time as rTime,p.status,p.insert_time as receiveTime,n.source_type as sourceType
+    from t_notice_noticeperson p
+    left join
+    t_notice_notice n
+    on n.id = p.notice_id
+    where 1=1
+    <if test="createrName != null">
+    		and n.creater_name = #{createrName}
+    </if>
+    <if test="uid != null and uid gt 0">
+    		<if test="type != null and type == 1">
+    			and p.uid = #{uid} 
+    		</if>
+   		<if test="type != null and type == 2">
+    			and n.creater_uid = #{uid} 
+    		</if>
+    		<if test="type != null and type == 3">
+    			and (n.creater_uid = #{uid} or  p.uid = #{uid})
+    		</if>
+    </if>
+    <if test="sourceType != null and sourceType gt 0">
+    		and n.source_type = #{sourceType}
+    </if>
+    <if test="isread != null">
+  		and p.is_read = #{isread}
+    </if>
+    <if test="title != null">
+    		and n.title Like CONCAT('%','${title}','%')
+    </if>
+    and p.status = 0
+    and n.status = 0
+    order by n.id desc
+  </select>
+</mapper>

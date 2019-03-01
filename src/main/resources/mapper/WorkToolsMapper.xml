@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wh.tms.dao.wt.IWorkToolDAO">
+  <resultMap id="BaseResultMap" type="com.wh.tms.entity.po.WorkTools">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="uid" jdbcType="INTEGER" property="uid" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="dept_id" jdbcType="INTEGER" property="deptId" />
+    <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
+    <result column="category_id" jdbcType="INTEGER" property="categoryId" />
+    <result column="category_number" jdbcType="VARCHAR" property="categoryNumber" />
+    <result column="category_name" jdbcType="VARCHAR" property="categoryName" />
+    <result column="manager_category_id" jdbcType="INTEGER" property="managerCategoryId" />
+    <result column="manager_category_name" jdbcType="VARCHAR" property="managerCategoryName" />
+    <result column="repository_id" jdbcType="INTEGER" property="repositoryId" />
+    <result column="repository_name" jdbcType="VARCHAR" property="repositoryName" />
+    <result column="manufacturer_id" jdbcType="INTEGER" property="manufacturerId" />
+    <result column="manufacturer_name" jdbcType="VARCHAR" property="manufacturerName" />
+    <result column="supplier_id" jdbcType="INTEGER" property="supplierId" />
+    <result column="supplier_name" jdbcType="VARCHAR" property="supplierName" />
+    <result column="factory_number" jdbcType="VARCHAR" property="factoryNumber" />
+    <result column="brand" jdbcType="VARCHAR" property="brand" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="in_storage_time" jdbcType="VARCHAR" property="inStorageTime" />
+    <result column="add_count" jdbcType="INTEGER" property="addCount" />
+    <result column="tools_code" jdbcType="VARCHAR" property="toolsCode" />
+    <result column="year_limit" jdbcType="VARCHAR" property="yearLimit" />
+    <result column="evaluation" jdbcType="INTEGER" property="evaluation" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    id, uid, user_name, dept_id, dept_name, category_id, category_number, category_name, 
+    manager_category_id, manager_category_name, repository_id, repository_name, manufacturer_id, 
+    manufacturer_name, supplier_id, supplier_name, factory_number, brand, insert_time, 
+    in_storage_time, add_count, tools_code, year_limit, evaluation, status
+  </sql>
+  
+  <select id="selectForList"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_work_tools
+    where 1 = 1
+    	 <!--  <if test="uid != null">
+        and uid = #{uid}
+      </if>
+      <if test="userName != null">
+        and user_name = #{userName}
+      </if>
+      <if test="deptId != null">
+        and dept_id = #{deptId}
+      </if>
+       <if test="categoryNumber != null">
+        and category_number = #{categoryNumber}
+      </if>
+      <if test="categoryName != null">
+        and category_name = #{categoryName}
+      </if>
+      <if test="addCount != null">
+        and add_count = #{addCount}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+       <if test="temp != null">
+        and temp = #{temp}
+      </if>
+      <if test="temp1 != null">
+        and temp1 = #{temp1}
+      </if>
+      <if test="temp2 != null">
+        and temp2 = #{temp2}
+      </if>
+       -->
+      <if test="deptName != null">
+        and dept_name like '%${deptName}%'
+      </if>
+     <if test="categoryName != null">
+        and category_name = #{categoryName}
+      </if>
+      <if test="insertTime != null">
+      	<![CDATA[ and (DATE_FORMAT(insert_time, '%Y-%m-%d')) = #{insertTime} ]]>
+      </if>
+      
+     
+  </select>
+  
+</mapper>

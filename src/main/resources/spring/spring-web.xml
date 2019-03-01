@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd  
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd  
+            http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd              
+            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+    
+    <!-- 配置静态资源 -->  
+    <mvc:resources mapping="/static/**" location="/static/"/>
+    <mvc:resources mapping="/doc/**" location="/doc/"/>
+    
+    <!-- 扫描web相关的bean -->
+    	<context:component-scan base-package="com.wh.tms.web" >
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+    <!-- 添加SpringMVC注解驱动 -->  
+	<mvc:annotation-driven>
+		<mvc:message-converters>
+			<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />  
+            <bean class="org.springframework.http.converter.FormHttpMessageConverter" />  
+            <bean class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />  
+			<!-- @ResponseBody乱码问题，将StringHttpMessageConverter的默认编码设为UTF-8 -->
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                   <property name="supportedMediaTypes">
+                        <list>
+                            <bean class="org.springframework.http.MediaType">
+                                <constructor-arg index="0" value="text" />
+                                <constructor-arg index="1" value="plain" />
+                                <constructor-arg index="2" value="UTF-8" />
+                            </bean>
+                        </list>
+                    </property>
+          	</bean>
+          	<!-- API接口默认返回FASTJSON -->
+			<bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+				<property name="charset" value="UTF-8" />
+				<property name="supportedMediaTypes">
+					<list>
+						<value>application/json</value>
+						<value>text/html;charset=UTF-8</value>
+					</list>
+				</property>
+				<property name="features">
+					<list>
+						<value>WriteMapNullValue</value>
+						<value>QuoteFieldNames</value>
+						<value>WriteDateUseDateFormat</value>
+						<value>WriteEnumUsingToString</value>
+						<value>DisableCircularReferenceDetect</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+	<bean id="DisableCircularReferenceDetect" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+	   <property name="staticField" value="com.alibaba.fastjson.serializer.SerializerFeature.DisableCircularReferenceDetect"></property>
+	</bean>
+	<!-- 支持跨域请求 -->
+  	<!-- <mvc:cors>
+        <mvc:mapping path="/**" allowed-origins="*" allowed-headers="Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, x-access-token" allow-credentials="true" max-age="3600" allowed-methods="GET,POST,OPTIONS"/>
+    </mvc:cors> -->
+     <!-- 配置ViewResolver -->
+     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
+     </bean>
+     
+     <bean id="propertyConfigurer" class="com.wh.tms.util.PropertiesUtils">
+		<property name="locations">
+			<list>
+				<value>classpath:setting-web.properties</value>
+			</list>
+		</property>
+	</bean>
+	<!-- 配置拦截器  -->
+	<!-- <mvc:interceptors>
+		<mvc:interceptor>
+        		<mvc:mapping path="/**"/>  
+        		<bean class="com.wh.tms.interceptor.TokenVerifyInterceptor"></bean>
+    		</mvc:interceptor> 
+	</mvc:interceptors> -->
+     <!-- 文件上传配置注意:这里申明的id必须为multipartResolver -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize">
+			<value>104857600</value>
+		</property>
+		<property name="maxInMemorySize">
+			<value>4096</value>
+		</property>
+	</bean>
+	
+</beans>
